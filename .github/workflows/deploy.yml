@@ -3,7 +3,7 @@ name: Deploy TerriaMap
 on:
   push:
     branches:
-      - main  # Trigger the workflow on push to main branch
+      - main
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # Use the Node.js version required by TerriaMap
+        node-version: '14'
 
     - name: Install dependencies
       run: npm install
@@ -24,10 +24,16 @@ jobs:
     - name: Build TerriaMap
       run: npm run gulp release
 
+    - name: Upload logs
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-logs
+        path: /home/runner/.npm/_logs/
+
     - name: Deploy to GitHub Pages
       if: success()
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./wwwroot
-
